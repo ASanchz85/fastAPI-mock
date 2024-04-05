@@ -26,6 +26,11 @@ my_posts = [
 
 @app.get("/")
 async def root():
+    return {"message": "welcome to our API, visit the link below to get access to the documentation", "docs_link": "http://localhost:8000/docs", "error": None}
+
+    
+@app.get("/posts")
+async def get_posts():
     return {"message": "Successfully requested", "data": my_posts, "error": None}
 
 
@@ -37,3 +42,11 @@ async def create_post(new_post: Post):
     my_posts.append(post_dict)
     print(my_posts)
     return {"message": "Successfully created post", "data": post_dict, "error": None}
+
+
+@app.get("/posts/{post_id}")
+async def get_single_post(post_id: int):
+    for post in my_posts:
+        if post["id"] == post_id:
+            return {"message": "Successfully requested", "data": post, "error": None}
+    return {"message": "Post not found", "data": None, "error": "Post not found"}
