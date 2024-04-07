@@ -46,7 +46,7 @@ async def get_posts():
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-async def create_post(new_post: Post, response: Response):
+async def create_post(new_post: Post):
     # !deprecated >> my_posts.append(new_post.dict())
     post_dict = new_post.__dict__
     post_dict["id"] = randrange(0, 100000)
@@ -65,10 +65,9 @@ async def get_latest_post():
 
 
 @app.get("/posts/{post_id}")
-async def get_single_post(post_id: int, response: Response):
+async def get_single_post(post_id: int):
     for post in my_posts:
         if post["id"] == post_id:
-            response.status_code = status.HTTP_200_OK
             return {"message": "Successfully requested", "data": post, "error": None}
 
     raise HTTPException(status_code=404, detail="Post not found")
@@ -85,3 +84,17 @@ async def delete_post(post_id: int, status_code=status.HTTP_204_NO_CONTENT):
             return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail="Post not found")
+
+
+@app.put("/posts/{post_id}")
+async def update_post(post_id: int, updated_post: Post):
+    for post in my_posts:
+        if post["id"] == post_id:
+            post["title"] = updated_post.title
+            post["content"] = updated_post.content
+            post["published"] = updated_post.published
+            post["rating"] = updated_post.rating if updated_post.rating else post["rating"]
+
+            return {"message": "Successfully updated post", "data": post, "error": None}
+
+    raise HTTPException(status_code=404, detail="Post not found") 
