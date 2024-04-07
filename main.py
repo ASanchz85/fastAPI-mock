@@ -70,6 +70,18 @@ async def get_single_post(post_id: int, response: Response):
         if post["id"] == post_id:
             response.status_code = status.HTTP_200_OK
             return {"message": "Successfully requested", "data": post, "error": None}
-    
+
     raise HTTPException(status_code=404, detail="Post not found")
     # return {"message": "Post not found", "data": None, "error": "Post not found"}
+
+
+@app.delete("/posts/{post_id}")
+async def delete_post(post_id: int, status_code=status.HTTP_204_NO_CONTENT):
+    for post in my_posts:
+        if post["id"] == post_id:
+            my_posts.remove(post)
+
+            # ?? when using 204 status code, you don't need to return any data
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    raise HTTPException(status_code=404, detail="Post not found")
