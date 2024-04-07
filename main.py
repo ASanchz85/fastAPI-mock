@@ -20,6 +20,13 @@ my_posts = [
         "published": True,
         "rating": 5,
         "id": 1
+    },
+    {
+        "title": "second post as an example",
+        "content": "another simple post to test the API",
+        "published": True,
+        "rating": 3,
+        "id": 2
     }
 ]
 
@@ -42,6 +49,13 @@ async def create_post(new_post: Post):
     my_posts.append(post_dict)
     print(my_posts)
     return {"message": "Successfully created post", "data": post_dict, "error": None}
+
+
+# !carefull with the order of the routes, because the one with the variable can't be the first one
+@app.get("/posts/latest")
+async def get_latest_post():
+    latest_post = my_posts[-1]
+    return {"message": "Successfully requested", "data": latest_post, "error": None}
 
 
 @app.get("/posts/{post_id}")
