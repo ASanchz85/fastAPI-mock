@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, status, HTTPException
 from pydantic import BaseModel
 from random import randrange
 
@@ -45,21 +45,22 @@ async def get_posts():
     return {"message": "Successfully requested", "data": my_posts, "error": None}
 
 
-@app.post("/posts")
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
 async def create_post(new_post: Post, response: Response):
     # !deprecated >> my_posts.append(new_post.dict())
     post_dict = new_post.__dict__
     post_dict["id"] = randrange(0, 100000)
     my_posts.append(post_dict)
-    response.status_code = status.HTTP_201_CREATED
+
+    # ?? note that you don't need to type each response.status_code, you can just use the status code as a parameter
+    # response.status_code = status.HTTP_201_CREATED
     return {"message": "Successfully created post", "data": post_dict, "error": None}
 
 
 # !carefull with the order of the routes, because the one with the variable can't be the first one
-@app.get("/posts/latest")
-async def get_latest_post(response: Response):
+@app.get("/posts/latest", status_code=status.HTTP_200_OK)
+async def get_latest_post():
     latest_post = my_posts[-1]
-    response.status_code = status.HTTP_200_OK
     return {"message": "Successfully requested", "data": latest_post, "error": None}
 
 
@@ -69,5 +70,6 @@ async def get_single_post(post_id: int, response: Response):
         if post["id"] == post_id:
             response.status_code = status.HTTP_200_OK
             return {"message": "Successfully requested", "data": post, "error": None}
-    response.status_code = status.HTTP_404_NOT_FOUND
-    return {"message": "Post not found", "data": None, "error": "Post not found"}
+    
+    raise HTTPException(status_code=404, detail="Post not found")
+    # return {"message": "Post not found", "data": None, "error": "Post not found"}
