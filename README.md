@@ -66,3 +66,6 @@ This repository contains a FastAPI Python bundle. Follow the instructions below 
 If you're deploying this application for production, make sure to change the --reload flag when running uvicorn as it's meant for development purposes only.
 Customize the FastAPI application according to your project requirements by modifying the files in the repository.
 Refer to the FastAPI documentation for more advanced usage and features: FastAPI Documentation
+
+
+2:49

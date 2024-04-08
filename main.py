@@ -1,9 +1,14 @@
+import os
 from typing import Optional
 from fastapi import FastAPI, Response, status, HTTPException
 from pydantic import BaseModel
 from random import randrange
+from dotenv import load_dotenv
+import psycopg2
+
 
 app = FastAPI()
+load_dotenv()
 
 
 class Post(BaseModel):
@@ -11,6 +16,21 @@ class Post(BaseModel):
     content: str
     published: bool = True
     rating: Optional[int] = None
+
+
+try:
+    connection = psycopg2.connect(
+        user=os.getenv("USER_DB"),
+        password=os.getenv("PASSWORD_DB"),
+        host=os.getenv("DATABASE_URL"),
+        port=os.getenv("DATABASE_PORT"),
+        database=os.getenv("DATABASE_NAME"),
+    )
+
+    cursor = connection.cursor()
+    print("Connection to PostgreSQL DB successful")
+except (Exception, psycopg2.Error) as error:
+    print("Error while connecting to PostgreSQL", error)
 
 
 my_posts = [
@@ -93,8 +113,10 @@ async def update_post(post_id: int, updated_post: Post):
             post["title"] = updated_post.title
             post["content"] = updated_post.content
             post["published"] = updated_post.published
-            post["rating"] = updated_post.rating if updated_post.rating else post["rating"]
+            post["rating"] = (
+                updated_post.rating if updated_post.rating else post["rating"]
+            )
 
             return {"message": "Successfully updated post", "data": post, "error": None}
 
-    raise HTTPException(status_code=404, detail="Post not found") 
+    raise HTTPException(status_code=404, detail="Post not found")
