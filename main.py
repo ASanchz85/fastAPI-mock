@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from random import randrange
 from dotenv import load_dotenv
 import psycopg2
+from psycopg2.extras import RealDictCursor
 
 
 app = FastAPI()
@@ -15,7 +16,6 @@ class Post(BaseModel):
     title: str
     content: str
     published: bool = True
-    rating: Optional[int] = None
 
 
 try:
@@ -23,8 +23,9 @@ try:
         user=os.getenv("USER_DB"),
         password=os.getenv("PASSWORD_DB"),
         host=os.getenv("DATABASE_URL"),
-        port=os.getenv("DATABASE_PORT"),
         database=os.getenv("DATABASE_NAME"),
+        port=os.getenv("DATABASE_PORT"),
+        cursor_factory=RealDictCursor,
     )
 
     cursor = connection.cursor()
