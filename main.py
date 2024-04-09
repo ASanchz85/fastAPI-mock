@@ -20,11 +20,11 @@ class Post(BaseModel):
 
 try:
     connection = psycopg2.connect(
+        host=os.getenv("DATABASE_URL"),
+        port=os.getenv("DATABASE_PORT"),
+        database=os.getenv("DATABASE_NAME"),
         user=os.getenv("USER_DB"),
         password=os.getenv("PASSWORD_DB"),
-        host=os.getenv("DATABASE_URL"),
-        database=os.getenv("DATABASE_NAME"),
-        port=os.getenv("DATABASE_PORT"),
         cursor_factory=RealDictCursor,
     )
 
